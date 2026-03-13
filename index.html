@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<title>User Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-100 p-10">
+
+<div class="max-w-5xl mx-auto">
+
+<h1 class="text-3xl font-bold mb-6">User Management Dashboard</h1>
+<h1 class="text-3xl font-bold text-center text-purple-600">WEB CỦA KHẢI ĐÃ UPDATE!</h1>
+<!-- REGISTER FORM -->
+
+<div class="bg-white p-6 rounded-xl shadow mb-8">
+
+<h2 class="text-xl font-semibold mb-4">Create User</h2>
+
+<div class="grid grid-cols-2 gap-4">
+
+<input id="username" class="border p-2 rounded" placeholder="Username">
+<input id="password" type="password" class="border p-2 rounded" placeholder="Password">
+
+<input id="firstName" class="border p-2 rounded" placeholder="First Name">
+<input id="lastName" class="border p-2 rounded" placeholder="Last Name">
+
+<input id="dob" type="date" class="border p-2 rounded">
+
+</div>
+
+<button onclick="createUser()" 
+class="mt-4 bg-blue-600 hover:bg-red-600 text-white px-4 py-2 rounded">
+
+Create User
+
+</button>
+
+<p id="message" class="mt-3 text-sm"></p>
+
+</div>
+
+<!-- USER TABLE -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h2 class="text-xl font-semibold mb-4">User List</h2>
+
+<table class="w-full text-left">
+
+<thead class="border-b">
+
+<tr>
+
+<th class="py-2">Username</th>
+<th>First Name</th>
+<th>Last Name</th>
+<th>DOB</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="userTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const API = "https://triparted-cenogenetic-alejandrina.ngrok-free.dev/api/users"
+
+
+// LOAD USERS
+
+function loadUsers(){
+
+fetch(API)
+.then(res => res.json())
+.then(data => {
+
+const users = data.result
+
+let html = ""
+
+users.forEach(user => {
+
+html += `
+<tr class="border-b">
+
+<td class="py-2">${user.username}</td>
+<td>${user.firstName}</td>
+<td>${user.lastName}</td>
+<td>${user.dob}</td>
+
+<td>
+
+<button
+class="bg-red-500 text-white px-2 py-1 rounded"
+onclick="deleteUser('${user.id}')">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+`
+
+})
+
+document.getElementById("userTable").innerHTML = html
+
+})
+
+}
+
+
+// CREATE USER
+
+function createUser(){
+
+const user = {
+
+username: username.value,
+password: password.value,
+firstName: firstName.value,
+lastName: lastName.value,
+dob: dob.value
+
+}
+
+fetch(API,{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(user)
+
+})
+.then(res => res.json())
+.then(data => {
+
+if(data.code === 1000){
+
+message.innerHTML = "✅ User created"
+message.className="text-green-600"
+
+loadUsers()
+
+}else{
+
+message.innerHTML = data.message
+message.className="text-red-600"
+
+}
+
+})
+
+}
+
+
+// DELETE USER
+
+function deleteUser(id){
+
+fetch(API+"/"+id,{
+method:"DELETE"
+})
+.then(()=>loadUsers())
+
+}
+
+
+// LOAD WHEN PAGE START
+
+loadUsers()
+
+</script>
+
+</body>
+</html>
